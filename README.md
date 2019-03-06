@@ -1,5 +1,5 @@
-# SequenceAlignment
-## Project 2 for Intro to Bioinformatics
+# SequenceAlignment 
+Project 2 for Intro to Bioinformatics
 * http://www.cs.uakron.edu/~duan/class/445/Projects/Project2.htm
 
 # Links
