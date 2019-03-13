@@ -1,7 +1,7 @@
 # SequenceAlignment
 Project 2 for Intro to Bioinformatics
 * http://www.cs.uakron.edu/~duan/class/445/Projects/Project2.htm
-* https://www.ncbi.nlm.nih.gov/nuccore/KF021600.1 (Our segment)
+* https://www.ncbi.nlm.nih.gov/nuccore/KF021600.1 (Our segment \#7)
 
 # Links
 * https://en.wikipedia.org/wiki/Sequence_alignment
