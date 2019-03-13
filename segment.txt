@@ -1,0 +1,20 @@
+;; Influenza A virus segment 7 matrix
+;; https://www.ncbi.nlm.nih.gov/nuccore/KF021600.1
+
+atgagtcttc taaccgaggt cgaaacgtac gttctctcta tcattccatc aggccccctc
+aaagccgaga tcgcacagag acttgaggat gtttttgcag ggaagaacgc agatctcgag
+gctctcatgg agtggataaa gacaagacca atcctgtcac ctctgactaa ggggatttta
+gggtttgtgt tcacgctcac cgtgcccagt gagcgaggac tgcagcgtag acggtttgtc
+caaaacgccc taaatgggaa tggagaccca aacaacatgg acaaggcggt taaattatac
+aagaaactga agagggaaat gacatttcat ggagcaaagg aagttgcact cagttactca
+actggtgcgc ttgccagctg catgggtctc atatacaaca gaatggggac tgtgaccgca
+gaaggggctc ttggactagt atgtgccact tgtgagcaga ttgctgacgc acaacatcgg
+tcccacaggc agatggcgac tactactaac ccactaatta ggcatgagaa tagaatggta
+ctagccagca ctacggctaa ggctatggag cagatggctg gatcaagtga acaggcagcg
+gaagccatgg aagttgcaag tcaggctagg caaatggtgc aggctatgag aacagttggg
+actcacccta actccagtac aggtctaaaa gatgatctta ttgaaaattt gcaggcctac
+cagaaccgga tgggagtgca actgcagcgg ttcaagtgag cctctagtcg ttgcagctaa
+cattattggg atattgcact tgatattgtg gattcttgat cgtcttttct tcaaatgcat
+ttatcgtcgt tttaaatacg gtttgaaaag agggccttct acggaaggaa tgcctgagtc
+tatgagggaa gaatatcggc aggaacagca gaatgctgtg gatgttgacg atggtcattt
+tgtcaacata gagctgaagt aaaaa
