@@ -14,3 +14,9 @@ Project 2 for Intro to Bioinformatics
 
 # Link to Ohio Sequence 7
 * https://www.ncbi.nlm.nih.gov/nuccore/FJ984398.1
+
+# BLAST 
+* https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastn&PAGE_TYPE=BlastSearch&LINK_LOC=blasthome
+
+# BLAST Results Window (Finished)
+* https://blast.ncbi.nlm.nih.gov/Blast.cgi
