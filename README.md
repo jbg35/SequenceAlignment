@@ -11,3 +11,6 @@ Project 2 for Intro to Bioinformatics
 * https://www.cs.mcgill.ca/~rwest/wikispeedia/wpcd/wp/s/Sequence_alignment.htm
 
 * http://www.cs.us.es/~fran/students/julian/sequence_alignment/sequence_alignment.html
+
+# Link to Ohio Sequence 7
+* https://www.ncbi.nlm.nih.gov/nuccore/FJ984398.1
