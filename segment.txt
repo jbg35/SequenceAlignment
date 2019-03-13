@@ -1,6 +1,6 @@
 ;; Influenza A virus segment 7 matrix
 ;; https://www.ncbi.nlm.nih.gov/nuccore/KF021600.1
-
+;;
 atgagtcttc taaccgaggt cgaaacgtac gttctctcta tcattccatc aggccccctc
 aaagccgaga tcgcacagag acttgaggat gtttttgcag ggaagaacgc agatctcgag
 gctctcatgg agtggataaa gacaagacca atcctgtcac ctctgactaa ggggatttta
