@@ -18,11 +18,11 @@ gap         = -2
 
 
 def align(seq1, seq2):
+    #Printing string info
     print('seq1: ', seq1,'\n' 'seq2: ',  seq2)
     seq1len = len(seq1)
     seq2len = len(seq2)
     print('len: ', seq1len, seq2len)
-
 
     # Smith-Waterman algorithm for local sequence alignment
     # https://en.wikipedia.org/wiki/Smith%E2%80%93Waterman_algorithm
@@ -35,7 +35,7 @@ def align(seq1, seq2):
     #    row and first column. The size of the scoring matrix is:
     #    (n + 1) * (m + 1).
     # 3: Fill the scoring matrix using the equation below
-    #    The max of the diagonals, left adjacent and right adjacent
+    #    The max of the diagonals, left adjacent and right adjacent, or 0
     # 4: Traceback in the matrix. starting at the element with the highest
     #    score, traceback based on the source of each score reursively,
     #    until 0 is encountered
@@ -77,14 +77,22 @@ def align(seq1, seq2):
 
     #prints matrix all clean like
     print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
-    ## TODO: Left side of matrix letters.
+    ## TODO: left letters maybe???
     print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
 
     return matrix, max_pos
 
 def score_matrix(matrix, x, y):
-    similarity = match if seq1[x-1] == seq2[y-1] else mismatch
-    diag = matrix[x-1][y-1] + similarity
+    # Scores the matrix. Starts at top left of matrixand works its way
+    # right until end of column. Then continues to the next row.
+    # Returns the max of the diagonal value, up_adj, and left_adj
+    # (given match, mismatch, and gap penalty)
+
+    # if seq1[a] == seq2[b]
+    #   then: match
+    #   else: mismatch
+    diag = matrix[x-1][y-1] + (match if seq1[x-1] == seq2[y-1] else mismatch)
+
     up_adj = matrix[x-1][y] + gap
     left_adj = matrix[x][y-1] + gap
     return max(0, diag, up_adj, left_adj)
