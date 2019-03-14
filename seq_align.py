@@ -1,8 +1,8 @@
 import sys
 #match      = +m
-match       = 2
+match       = 3
 #mismatch   = -s
-mismatch    = 0
+mismatch    = -3
 #gap        = -d
 gap         = -2
 #scoring  F = (# matches)*m - (# mismatches)*s -(#gaps)*d
@@ -24,7 +24,8 @@ def align(seq1, seq2):
     print('len: ', seq1len, seq2len)
 
 
-    #Smith-Waterman algorithm for local sequence alignment
+    # Smith-Waterman algorithm for local sequence alignment
+    # https://en.wikipedia.org/wiki/Smith%E2%80%93Waterman_algorithm
     # 1: Determine the subistitution matrix and the gap penalty
     #    scheme
     #    * s(a,b) - similarity score of the elements that
@@ -37,53 +38,32 @@ def align(seq1, seq2):
     #    The max of the diagonals, left adjacent and right adjacent
 
     # 2:
-    matrix = [[0 for x in range(seq1len)] for y in range(seq2len)]
-
-    for i in range(1, seq1len):
-        for j in rnage(1,seq2len):
-            score  = calc_score(score_matrix,i,j)
-
-
+    matrix = [[0 for x in range(seq2len+1)] for y in range(seq1len+1)]
+    max_score = 0
+    max_pos = None
+    for i in range(1, seq1len+1):
+        for j in range(1,seq2len+1):
+            score  = calc_score(matrix,i,j)
+            if score > max_score:
+                max_score = score
+                max_pos = (i,j)
+            matrix[i][j] = score
 
     #prints matrix all clean like
-    print('   ', ''.join(['{:5}'.format(item) for item in seq1]))
+    print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
     print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
-    print('\n'.join('{:}'.format(test) for test in seq1 ) )
+    return matrix, max_pos
 
-
-
-def calc_score():
+def calc_score(matrix, x, y):
     similarity = match if seq1[x-1] == seq2[y-1] else mismatch
     diag = matrix[x-1][y-1] + similarity
     up_adj = matrix[x-1][y] + gap
     left_adj = matrix[x][y-1] + gap
     return max(0, diag, up_adj, left_adj)
-    pass
-
 
 if __name__ == "__main__":
 
-    seq1 = 'atgagtcttc'
-    seq2 = 'atcgacgtca'
+    seq1 = 'ggttgacta'
+    seq2 = 'tgttacgg'
 
     align(seq1, seq2)
-
-
-
-
-        #
-        # #initialize matrix for scoring
-        # ## FIXME: make size for only what is needed????
-        # matrix = [[0 for x in range(max(seq1len+1,seq2len+1))] for y in range(max(seq1len+1,seq2len+1))]
-        # for i in range (1, seq1len+1):
-        #     matrix[i][0] = i * gap
-        #     matrix[0][i] = i * gap
-        #
-        # for i in range(seq1len+1):
-        #     for j in range(seq2len+1):
-        #         if seq1[i-1] == seq2[j-1]:
-        #             matrix[i][j] = matrix[i-1][j-1]
-        #         else:
-        #             matrix[i][j] = min({matrix[i-1][j-1]+mismatch,
-        #                                 matrix[i-1][j]+ gap      ,
-        #                                 matrix[i][j-1]+ gap       })
