@@ -14,7 +14,11 @@ import sys
 ## # TODO: Add functions for adding statistics to final output;
 ##         how many similar 'chars', how many gaps, how many mismatches
 ##         total score
-
+## # TODO: Rename align(), traceback() so that global alignment can be implemented,
+##         align()-> localAlign(), traceback()-> localTraceback(), score_matrix() -> localMatrix()
+##                -> globalAlign(),           -> globalTraceback,                 -> globalMatrix()
+##         Make scores a local variable. (Use same scores for local and global???)
+##         Changeable scores???
 #match      = +m
 match       = 3
 #mismatch   = -s
@@ -152,8 +156,9 @@ def traceback(matrix, maxpos):
             formatter.append(':')
 
     ###### DIRTY(DON'T LOOK) ######
+    ## There's gotta be a better way......
     ## Move this to another function write_out() ???? Probably
-    ## Also do this all in one go using maxLen and by20
+    ## Also do this all in one go using maxLen and by20. maybe not.
     maxLent = len(align1)
     by20t = 0
     while by20t < maxLent/20:
@@ -250,12 +255,22 @@ def read_file():
     Seq2 = x[1]
 
     return Seq1, Seq2
+## Future functions
+def write_file():
+    pass
+def formatter():
+    pass
+def print_alignment():
+    pass
+def scores():
+    #scores; matches, mismatches, indels
+    pass
 
 if __name__ == "__main__":
 
-    seq1 = 'tgttacgg'
-    seq2 = 'ggttgacta'
-    #seq1, seq2 = read_file()
+    #seq1 = 'tgttacgg'
+    #seq2 = 'ggttgacta'
+    seq1, seq2 = read_file()
 
     matrix, maxpos = align(seq1, seq2)
     traceback(matrix, maxpos)
