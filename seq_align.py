@@ -18,8 +18,7 @@ gap         = -2
 
 
 def align(seq1, seq2):
-    #Printing string info
-    print('seq1: ', seq1,'\n' 'seq2: ',  seq2)
+    # Some sequence info
     seq1len = len(seq1)
     seq2len = len(seq2)
     print('len: ', seq1len, seq2len)
@@ -64,7 +63,8 @@ def align(seq1, seq2):
                 max_score = score
                 max_pos = (i,j)
             matrix[i][j] = score
-    #print(matrix[7][6])
+
+    ## Save this for now for debugging purposes
     #prints matrix all clean like
     #print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
     ## TODO: left letters maybe???
@@ -85,7 +85,7 @@ def traceback(matrix, maxpos):
     ## Stepper looks for max(up,left,diagonal)
     ##
     ## while(0 is not found)
-    ##  if stepper => diagonal: match/mismatch
+    ##  if stepper   => diagonal: match/mismatch
     ##  elif stepper => up: gap in seq1
     ##  elif stepper => left: gap in seq2
     align1 = []
@@ -94,7 +94,6 @@ def traceback(matrix, maxpos):
     stepper = next_step(matrix, x, y)
     while(stepper != 0):
         # Keep char in string if we traverse diagonaly
-        #print('step:', stepper)
         if stepper == 1:
             align1.append(seq1[x-1])
             align2.append(seq2[y-1])
@@ -110,16 +109,10 @@ def traceback(matrix, maxpos):
             x -= 1
         stepper = next_step(matrix, x, y)
 
-        #print('step after:', stepper)
-
-
     align1.append(seq1[x-1])
     align2.append(seq2[y-1])
     # Initially reversed because we are working backward on the string
-    #print(align1)
-    #print(align2)
-    #print('\n')
-
+    # Use array manipulation to reverse string
     align1 = align1[::-1]
     align2 = align2[::-1]
 
@@ -136,18 +129,24 @@ def traceback(matrix, maxpos):
     # print(' '.join(formatter))
     # print(' '.join(align2))
     ###### DIRTY(DON'T LOOK) ######
+    #Move this to another function write_out()
     maxLent = len(align1)
     by20t = 0
     while by20t < maxLent/20:
+        print(by20t*20 + 1, ':', ((by20t+1)*20)-1)
+        print('   ', end='')
         for s in align1[20*by20t:by20t*20 +19]:
             print(s, end='')
         print('\n')
+        print('   ', end='')
         for t in formatter[20*by20t:by20t*20 +19]:
             print(t, end='')
         print('\n')
+        print('   ', end='')
         for u in align2[20*by20t:by20t*20 +19]:
             print(u, end='')
         print('\n')
+
         by20t += 1
 
     maxLen = len(align1)
@@ -178,7 +177,7 @@ def next_step(matrix, x, y):
     #print(diag, ' ', up, ' ', left)
     maxstep = max(diag,up,left)
     if (diag and up and left) == 0:
-        print('END')
+        print('Finished with traceback')
         return 0
 
     if diag == maxstep:
