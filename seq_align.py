@@ -1,4 +1,13 @@
 import sys
+
+
+## Only really does one align of max value from the score_matrix
+## # TODO: Look for other max values to use for local alignments
+## # TODO: Global alignment?????
+## # TODO: Add functions for adding statistics to final output;
+##         how many similar 'chars', how many gaps, how many mismatches
+##         total score
+
 #match      = +m
 match       = 3
 #mismatch   = -s
@@ -14,8 +23,6 @@ gap         = -2
 #don't penalize gaps on either end
 
 #insertions and/or deletions are called indels
-
-
 
 def align(seq1, seq2):
     # Some sequence info
@@ -67,7 +74,6 @@ def align(seq1, seq2):
     ## Save this for now for debugging purposes
     #prints matrix all clean like
     #print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
-    ## TODO: left letters maybe???
     #print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
 
     return matrix, max_pos
@@ -88,12 +94,21 @@ def traceback(matrix, maxpos):
     ##  if stepper   => diagonal: match/mismatch
     ##  elif stepper => up: gap in seq1
     ##  elif stepper => left: gap in seq2
+
     align1 = []
     align2 = []
     (x,y) = maxpos
     stepper = next_step(matrix, x, y)
+
+    # if our max step is diagonally
+    #   from seq1,seq2 append both 'chars' to align1, and align2
+    # if our max step is up
+    #   append a gap to align1
+    #   from seq2 append 'char' to align2
+    # if our max step is left
+    #   from seq1 append 'char' to align1
+    #   append a gap to align2
     while(stepper != 0):
-        # Keep char in string if we traverse diagonaly
         if stepper == 1:
             align1.append(seq1[x-1])
             align2.append(seq2[y-1])
@@ -109,27 +124,29 @@ def traceback(matrix, maxpos):
             x -= 1
         stepper = next_step(matrix, x, y)
 
+    # Appends last 'chars' to our align1,align2 after
+    # while loop is dropped out of by the return of 0 from next_step()
     align1.append(seq1[x-1])
     align2.append(seq2[y-1])
+
     # Initially reversed because we are working backward on the string
     # Use array manipulation to reverse string
     align1 = align1[::-1]
     align2 = align2[::-1]
 
+    # Creates a 'formatter' for printing out pretty comparison.
     formatter = []
     for i in range(len(align1)):
         if align1[i] == align2[i]:
             formatter.append('|')
-        elif (align1[i] or align2[i]) == '-':
+        elif (align1[i] == '-') or (align2[i] == '-'):
             formatter.append(' ')
         elif align1[i] != align2[i]:
             formatter.append(':')
 
-    # print(' '.join(align1))
-    # print(' '.join(formatter))
-    # print(' '.join(align2))
     ###### DIRTY(DON'T LOOK) ######
-    #Move this to another function write_out()
+    ## Move this to another function write_out() ???? Probably
+    ## Also do this all in one go using maxLen and by20
     maxLent = len(align1)
     by20t = 0
     while by20t < maxLent/20:
@@ -151,7 +168,7 @@ def traceback(matrix, maxpos):
 
     maxLen = len(align1)
     by20 = 0
-    ###### MORE DIRT ######
+    ###### MORE DIRT FOR THE WRITE FILE######
     with open("segment_aligned.txt", 'w+') as f:
         while by20 < maxLen/20:
             f.write(str(by20*20 +1))
@@ -176,10 +193,22 @@ def next_step(matrix, x, y):
     left =  matrix[x-1][y]
     #print(diag, ' ', up, ' ', left)
     maxstep = max(diag,up,left)
+    # Quick dropout function. If diag or up or left is zero
+    # then the function ends traceback.
     if (diag and up and left) == 0:
         print('Finished with traceback')
         return 0
 
+    # where diag is matrix[x-1][y-1]
+    #       up   is matrix[x][y-1]
+    #       left is matrix[x-1][y]
+    #       maxstep is whatever is the maximum between the 3 (diag,up,left)
+    # if diag == maxstep -> appends both 'chars'
+    #                       from seq1 and seq2 to align1 and align2
+    # if up   == maxstep -> appends a gap for align1
+    #                       and appends 'char' from seq2 to align2
+    # if left == maxstep -> appends 'char' from seq1 to align1
+    #                       and appends a gap for align2
     if diag == maxstep:
         return 1
     if up == maxstep:
@@ -189,7 +218,7 @@ def next_step(matrix, x, y):
     assert False
 
 def score_matrix(matrix, x, y):
-    # Scores the matrix. Starts at top left of matrixand works its way
+    # Scores the matrix. Starts at top left of matrix and works its way
     # right until end of column. Then continues to the next row.
     # Returns the max of the diagonal value, up_adj, and left_adj
     # (given match, mismatch, and gap penalty)
@@ -198,11 +227,16 @@ def score_matrix(matrix, x, y):
     #   then: match
     #   else: mismatch
     diag     = matrix[x-1][y-1] + (match if seq1[x-1] == seq2[y-1] else mismatch)
+
+    ## These are flipped on accident (i think????)
     up_adj   = matrix[x-1][y] + gap
     left_adj = matrix[x][y-1] + gap
     return max(0, diag, up_adj, left_adj)
 
 def read_file():
+    # Reading stuff from file. Has to be one long string
+    # in text file.
+    ## Use delimeter for multi-line reading????
     f = open("segment.txt", "r")
     x = f.read().split('\n')
     Seq1 = x[0]
@@ -218,3 +252,7 @@ if __name__ == "__main__":
 
     matrix, maxpos = align(seq1, seq2)
     traceback(matrix, maxpos)
+
+    print('Match if: \'|\'')
+    print('Mismatch if \':\'')
+    print('Gap if space')
