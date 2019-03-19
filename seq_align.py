@@ -1,9 +1,16 @@
 import sys
 
-
-## Only really does one align of max value from the score_matrix
-## # TODO: Look for other max values to use for local alignments
+## Local alignment implementation but,
+## only finds aligned sequence with the highest score
+## # TODO: Find other max values to use for local alignments ????
+##         Threshold for what a max value can be????
+##         FROM wikipedia:
+##         To obtain the second best local alignment, apply the traceback process starting at
+##         the second highest score outside the trace of the best alignment.
 ## # TODO: Global alignment?????
+##         FROM wikipedia: https://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm
+##         Probably easy, just need to create another matrix then traceback from,
+##         absolute bottom right.
 ## # TODO: Add functions for adding statistics to final output;
 ##         how many similar 'chars', how many gaps, how many mismatches
 ##         total score
@@ -248,7 +255,7 @@ if __name__ == "__main__":
 
     seq1 = 'tgttacgg'
     seq2 = 'ggttgacta'
-    seq1, seq2 = read_file()
+    #seq1, seq2 = read_file()
 
     matrix, maxpos = align(seq1, seq2)
     traceback(matrix, maxpos)
