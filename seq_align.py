@@ -1,4 +1,8 @@
 import sys
+# For my comments, usually one # (#) means comment is to explain code,
+# and two # (##) non-permanent stuff
+
+##  SHOULD PROBABLY ADD TESTS TO CONFIRM THIS EVEN works
 
 ## Local alignment implementation but,
 ## only finds aligned sequence with the highest score
@@ -27,13 +31,13 @@ mismatch    = -3
 gap         = -2
 #scoring  F = (# matches)*m - (# mismatches)*s -(#gaps)*d
 
-#minimal edit distance: given two strings x, y, find minimum # of edits
-#(insertions,deletions,mutations) to transform one string to the other
+##minimal edit distance: given two strings x, y, find minimum # of edits
+##(insertions,deletions,mutations) to transform one string to the other
 
-#ok to have unlimited # of gaps in beginning & end?
-#don't penalize gaps on either end
+##ok to have unlimited # of gaps in beginning & end?
+##don't penalize gaps on either end
 
-#insertions and/or deletions are called indels
+##insertions and/or deletions are called indels
 
 def align(seq1, seq2):
     # Some sequence info
@@ -57,19 +61,19 @@ def align(seq1, seq2):
     #    score, traceback based on the source of each score reursively,
     #    until 0 is encountered
 
-    ## NOTE: 1: Determine gap penalty scheme.
-    ##          * s(a,b) - similarity score of the elements that
-    ##            constituted the two sequences
-    ##          * W_k - the penalty of a gap that has length k
+    # NOTE: 1: Determine gap penalty scheme.
+    #          * s(a,b) - similarity score of the elements that
+    #            constituted the two sequences
+    #          * W_k - the penalty of a gap that has length k
     # GLOBAL VARIABLES AT THE TOP
     # match       = 3
     # mismatch    = -3
     # gap         = -2
 
-    ## NOTE: 2: & 3: creates a scoring matrix and fills according to
-    ##               match, mismatch, and gap scoring. Checks the max
-    ##               from the diagonal, left_adj, and up_adj. If none
-    ##               are above 0 fill current spot in matrix with 0.
+    # NOTE: 2: & 3: creates a scoring matrix and fills according to
+    #               match, mismatch, and gap scoring. Checks the max
+    #               from the diagonal, left_adj, and up_adj. If none
+    #               are above 0 fill current spot in matrix with 0.
     matrix = [[0 for x in range(seq2len+1)] for y in range(seq1len+1)]
     max_score = 0
     max_pos = None
@@ -83,28 +87,28 @@ def align(seq1, seq2):
             matrix[i][j] = score
 
     ## Save this for now for debugging purposes
-    #prints matrix all clean like
-    #print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
-    #print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
+    ##prints matrix all clean like
+    ##print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
+    ##print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
 
     return matrix, max_pos
 
 def traceback(matrix, maxpos):
-    ## NOTE: 4: Traceback in the matrix to find best alignment.
-    ##          Start at element with highest score, traceback based on the
-    ##          source of each score recursively, until 0 is encountered. The
-    ##          segments that have the highest similarity score based on the
-    ##          given scoring system is generated in this process. To obtain
-    ##          the second best local alignment, apply the traceback process
-    ##          starting at the second highest score outside the trace of the
-    ##          best alignment.
-    ##
-    ## Stepper looks for max(up,left,diagonal)
-    ##
-    ## while(0 is not found)
-    ##  if stepper   => diagonal: match/mismatch
-    ##  elif stepper => up: gap in seq1
-    ##  elif stepper => left: gap in seq2
+    # NOTE: 4: Traceback in the matrix to find best alignment.
+    #          Start at element with highest score, traceback based on the
+    #          source of each score recursively, until 0 is encountered. The
+    #          segments that have the highest similarity score based on the
+    #          given scoring system is generated in this process. To obtain
+    #          the second best local alignment, apply the traceback process
+    #          starting at the second highest score outside the trace of the
+    #          best alignment.
+    #
+    # Stepper looks for max(up,left,diagonal)
+    #
+    # while(0 is not found)
+    #  if stepper   => diagonal: match/mismatch
+    #  elif stepper => up: gap in seq1
+    #  elif stepper => left: gap in seq2
 
     align1 = []
     align2 = []
@@ -203,7 +207,11 @@ def next_step(matrix, x, y):
     diag =  matrix[x-1][y-1]
     up   =  matrix[x][y-1]
     left =  matrix[x-1][y]
-    #print(diag, ' ', up, ' ', left)
+
+    ## WHAT IF TWO ARE THE SAME???
+    ## If diag is the same with either(up, left) always go diag
+    ## What if up is same as left??? With max() I think hierarchy is diag->up->left
+    ## Does it matter???
     maxstep = max(diag,up,left)
     # Quick dropout function. If diag or up or left is zero
     # then the function ends traceback.
@@ -263,13 +271,19 @@ def formatter():
 def print_alignment():
     pass
 def scores():
-    #scores; matches, mismatches, indels
+    ##scores; matches, mismatches, indels
+    pass
+def globalAlign():
+    pass
+def globalMatrix():
+    pass
+def globalTrackback():
     pass
 
 if __name__ == "__main__":
 
-    #seq1 = 'tgttacgg'
-    #seq2 = 'ggttgacta'
+    ##seq1 = 'tgttacgg'
+    ##seq2 = 'ggttgacta'
     seq1, seq2 = read_file()
 
     matrix, maxpos = align(seq1, seq2)
