@@ -64,11 +64,11 @@ def align(seq1, seq2):
                 max_score = score
                 max_pos = (i,j)
             matrix[i][j] = score
-    print(matrix[7][6])
+    #print(matrix[7][6])
     #prints matrix all clean like
-    print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
+    #print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
     ## TODO: left letters maybe???
-    print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
+    #print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
 
     return matrix, max_pos
 
@@ -94,7 +94,7 @@ def traceback(matrix, maxpos):
     stepper = next_step(matrix, x, y)
     while(stepper != 0):
         # Keep char in string if we traverse diagonaly
-        print('step:', stepper)
+        #print('step:', stepper)
         if stepper == 1:
             align1.append(seq1[x-1])
             align2.append(seq2[y-1])
@@ -108,20 +108,17 @@ def traceback(matrix, maxpos):
             align1.append(seq1[x-1])
             align2.append('-')
             x -= 1
-        # print(align1)
-        # print()
-        # print(align2)
         stepper = next_step(matrix, x, y)
 
-        print('step after:', stepper)
+        #print('step after:', stepper)
 
 
     align1.append(seq1[x-1])
     align2.append(seq2[y-1])
     # Initially reversed because we are working backward on the string
-    print(align1)
-    print(align2)
-    print('\n')
+    #print(align1)
+    #print(align2)
+    #print('\n')
 
     align1 = align1[::-1]
     align2 = align2[::-1]
@@ -135,28 +132,61 @@ def traceback(matrix, maxpos):
         elif align1[i] != align2[i]:
             formatter.append(':')
 
-    print(' '.join(align1))
-    print(' '.join(formatter))
-    print(' '.join(align2))
+    # print(' '.join(align1))
+    # print(' '.join(formatter))
+    # print(' '.join(align2))
+    ###### DIRTY(DON'T LOOK) ######
+    maxLent = len(align1)
+    by20t = 0
+    while by20t < maxLent/20:
+        for s in align1[20*by20t:by20t*20 +19]:
+            print(s, end='')
+        print('\n')
+        for t in formatter[20*by20t:by20t*20 +19]:
+            print(t, end='')
+        print('\n')
+        for u in align2[20*by20t:by20t*20 +19]:
+            print(u, end='')
+        print('\n')
+        by20t += 1
 
+    maxLen = len(align1)
+    by20 = 0
+    ###### MORE DIRT ######
+    with open("segment_aligned.txt", 'w+') as f:
+        while by20 < maxLen/20:
+            f.write(str(by20*20 +1))
+            f.write(':')
+            f.write(str(((by20+1)*20) -1))
+            f.write('\n')
+            for s in align1[20*by20:by20*20 +19]:
+                f.write(s)
+            f.write('\n')
+            for t in formatter[20*by20:by20*20 +19]:
+                f.write(t)
+            f.write('\n')
+            for u in align2[20*by20:by20*20 +19]:
+                f.write(u)
+            f.write('\n\n')
+            by20 += 1
     return 0
 
 def next_step(matrix, x, y):
     diag =  matrix[x-1][y-1]
     up   =  matrix[x][y-1]
     left =  matrix[x-1][y]
-    print(diag, ' ', up, ' ', left)
+    #print(diag, ' ', up, ' ', left)
     maxstep = max(diag,up,left)
     if (diag and up and left) == 0:
         print('END')
         return 0
 
     if diag == maxstep:
-        return 1 
+        return 1
     if up == maxstep:
-        return 2 
+        return 2
     if left == maxstep:
-        return 3 
+        return 3
     assert False
 
 def score_matrix(matrix, x, y):
@@ -173,10 +203,19 @@ def score_matrix(matrix, x, y):
     left_adj = matrix[x][y-1] + gap
     return max(0, diag, up_adj, left_adj)
 
+def read_file():
+    f = open("segment.txt", "r")
+    x = f.read().split('\n')
+    Seq1 = x[0]
+    Seq2 = x[1]
+
+    return Seq1, Seq2
+
 if __name__ == "__main__":
 
     seq1 = 'tgttacgg'
     seq2 = 'ggttgacta'
+    seq1, seq2 = read_file()
 
     matrix, maxpos = align(seq1, seq2)
     traceback(matrix, maxpos)
