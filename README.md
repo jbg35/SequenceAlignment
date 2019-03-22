@@ -21,3 +21,5 @@ Project 2 for Intro to Bioinformatics
 # BLAST Results Window (Finished)
 * https://blast.ncbi.nlm.nih.gov/Blast.cgi
 * RID: 8JTTYPXE114
+
+![alt text](https://ibb.co/KWb8Hm2)
