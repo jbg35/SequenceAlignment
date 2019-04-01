@@ -93,8 +93,8 @@ def local_align(seq1, seq2):
 
     ## Save this for now for debugging purposes
     ##prints matrix all clean like
-    print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
-    print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
+    #print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
+    #print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
 
     return matrix, max_pos, max_score
 
@@ -298,8 +298,10 @@ def scores(align1, align2, max_score):
     print('\n')
 
 def globalAlign(seq1, seq2):
+    # Adds gap for filling out matrix
     seq1 = "-" + seq1
     seq2 = "-" + seq2
+
     seq1len = len(seq1)
     seq2len = len(seq2)
     matrix = []
@@ -347,7 +349,7 @@ def globalAlign(seq1, seq2):
     # Scores the rest of the table
     for i in range(1, seq1len):
         for j in range(1, seq2len):
-            diag        = matrix[i-1][j-1] + globalmatch
+            diag     = matrix[i-1][j-1] + (globalmatch if seq1[i-1] == seq2[j-1] else globalmismatch)
             left_adj    = matrix[i-1][j] + globalgap
             top_adj     = matrix[i][j-1] + globalgap
             matrix[i][j] = max(diag, left_adj, top_adj)
@@ -372,7 +374,8 @@ def g_next_step(matrix, x, y):
         return 2
     elif current == (left - globalgap):
         return 3
-
+    else:
+        print("what the", current,diag + globalmatch, up - globalgap,left - globalgap)
     assert False
 
 def globalTraceback(matrix, seq1, seq2):
@@ -380,8 +383,8 @@ def globalTraceback(matrix, seq1, seq2):
     align2 = []
     seq1len = len(seq1)
     seq2len = len(seq2)
-    x = seq1len - 1
-    y = seq2len - 1
+    x = seq1len
+    y = seq2len
 
     step = g_next_step(matrix, x, y)
     while(step!= 0):
@@ -417,18 +420,15 @@ if __name__ == "__main__":
     ##seq2 = 'ggttgacta'
     seq1, seq2 = read_file()
 
-    # matrix, maxpos, max_score = local_align(seq1, seq2)
-    # align1, align2 = local_traceback(matrix, maxpos)
-    # outputs(align1, align2)
-    # scores(align1,align2, max_score)
+    matrix, maxpos, max_score = local_align(seq1, seq2)
+    align1, align2 = local_traceback(matrix, maxpos)
+    outputs(align1, align2)
+    scores(align1,align2, max_score)
 
-    seq1 = 'GCATGCU'
-    seq2 = 'GATTACA'
-    matrix = globalAlign(seq1, seq2)
-
-    print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
-    print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
-
-    align1, align2 = globalTraceback(matrix,seq1,seq2)
-
-    print(align1, '\n', align2)
+    # seq1 = 'GCATGCU'
+    # seq2 = 'GATTACA'
+    # matrix = globalAlign(seq1, seq2)
+    # print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
+    # print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
+    # align1, align2 = globalTraceback(matrix,seq1,seq2)
+    # print(align1, '\n', align2)
