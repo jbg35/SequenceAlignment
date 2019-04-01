@@ -25,12 +25,16 @@ import sys
 ##         Changeable scores???
 
 #match      = +m
-match       = 3
+localmatch       = 3
 #mismatch   = -s
-mismatch    = -3
+localmismatch    = -3
 #gap        = -d
-gap         = -2
+localgap         = -2
 #scoring  F = (# matches)*m - (# mismatches)*s -(#gaps)*d
+
+globalmatch = 1
+globalmismatch = -1
+globalgap = -1
 
 ##minimal edit distance: given two strings x, y, find minimum # of edits
 ##(insertions,deletions,mutations) to transform one string to the other
@@ -89,10 +93,10 @@ def local_align(seq1, seq2):
 
     ## Save this for now for debugging purposes
     ##prints matrix all clean like
-    ##print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
-    ##print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
+    print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
+    print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
 
-    return matrix, max_pos
+    return matrix, max_pos, max_score
 
 def local_traceback(matrix, maxpos):
     # NOTE: 4: Traceback in the matrix to find best alignment.
@@ -197,11 +201,11 @@ def score_matrix(matrix, x, y):
     # if seq1[a] == seq2[b]
     #   then: match
     #   else: mismatch
-    diag     = matrix[x-1][y-1] + (match if seq1[x-1] == seq2[y-1] else mismatch)
+    diag     = matrix[x-1][y-1] + (localmatch if seq1[x-1] == seq2[y-1] else localmismatch)
 
     ## These are flipped on accident (i think????)
-    up_adj   = matrix[x-1][y] + gap
-    left_adj = matrix[x][y-1] + gap
+    up_adj   = matrix[x-1][y] + localgap
+    left_adj = matrix[x][y-1] + localgap
     return max(0, diag, up_adj, left_adj)
 
 # Reading stuff from file. Has to be one long string in text file.
@@ -271,7 +275,7 @@ def outputs(align1, align2):
 
     return 0
 
-def scores(align1, align2):
+def scores(align1, align2, max_score):
     ##scores; matches, mismatches, indels
     totalScore = 0
     same = 0
@@ -279,25 +283,133 @@ def scores(align1, align2):
     for i in range(0,len(align1)):
         if align1[i] == align2[i]:
             same = same + 1
-            totalScore = totalScore + match
+            totalScore = totalScore + localmatch
         elif (align1[i] != align2[i]) and ((align1[i] and align2[i]) != '-'):
-            totalScore = totalScore + mismatch
+            totalScore = totalScore + localmismatch
         elif align1[i] or align2[i] == '-':
-            totalScore = totalScore + gap
+            totalScore = totalScore + localgap
     identity = float(same) / len(align1) * 100
     print('--Smith-Waterman Results--')
     print('Total Score:', totalScore)
+    print('max_score:', max_score)
     print('Identical bases: ', same)
     print('Percent Identity: %.2f' % identity, '%')
     print('Aligned Sequence Length: ', len(align1))
     print('\n')
 
-def globalAlign():
-    pass
-def globalMatrix():
-    pass
-def globalTrackback():
-    pass
+def globalAlign(seq1, seq2):
+    seq1 = "-" + seq1
+    seq2 = "-" + seq2
+    seq1len = len(seq1)
+    seq2len = len(seq2)
+    matrix = []
+    # Needleman-Wunsch algorithm for global sequence alignment
+    # https://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm
+    # 1: Construct grid using seq1 and seq2
+    # 1.5: choose scoring system,
+    #      letters may either match, mismatch, or be matched to a gap.
+    #      Let's use Match = +1, Mismatch or Indel: -1
+    # 2: Filling in the table. First row and first column are scored by using
+    #    mismatch penalty increasing(decreasing) by what the penalty is
+    #    Each cell has 3 possible candidates.
+    #      1: Diagonal top-left neighbor has (x-1,y-1). Then comparing the two
+    #         bases. Add match if bases are same to top-left neighbor
+    #      2: Top-neighbor has a score (x, y-1). Moving from there represents an
+    #         indel so add mismatch score to top-neighbor
+    #      3: Left-neight has a score (x-1, y). Moving from there represents an
+    #         indel so add mismatch score to left-neighbor
+    #    Highest score is entered into the cell.
+    #    IF(highest candidate score is from two or all neighboring cells)
+    #      THEN: All directions reaching the highest candidate score must be noted
+    #            as possible origin cells in the finished matrix.
+    # 3: Traceback, tracing arrows back to origin,
+    #    Make a path from the cell on the bottom right bacl to the cell on the top left
+    #    by following the direction of the arrows,
+    #    Sequence is constructed by these rules:
+    #       1: A diagonal arrow represents a match or mismatch so the letter of the
+    #          column and the letter of the row of the origin cell will align
+    #       2: a horizontal or vertical arrow represents an indel. Horizonal will
+    #          align a gam ('-') to the letter of the row, vertical arrows will align
+    #          a gap to the letter of the column.
+    #       3: If there are multiple arrows to choose from, they represent a branching of
+    #          the alignments. If two or more branches all belong to paths from the bottom
+    #          left to the top right cell, they are equally viable alignments.
+    for i in range(seq1len):
+         matrix.append([0]*seq2len)
+
+    # Fills in first row and first column with necessary score
+    matrix[0][0] = 0
+    for i in range(1,seq1len):
+        matrix[0][i] = matrix[0][i-1] + globalgap
+    for j in range(1,seq2len):
+        matrix[j][0] = matrix[j-1][0] + globalgap
+
+    # Scores the rest of the table
+    for i in range(1, seq1len):
+        for j in range(1, seq2len):
+            diag        = matrix[i-1][j-1] + globalmatch
+            left_adj    = matrix[i-1][j] + globalgap
+            top_adj     = matrix[i][j-1] + globalgap
+            matrix[i][j] = max(diag, left_adj, top_adj)
+    return matrix
+
+def g_next_step(matrix, x, y):
+    current = matrix[x][y]
+    diag = matrix[x-1][y-1]
+    up   = matrix[x][y-1]
+    left = matrix[x-1][y]
+
+    if(x==0 or y==0):
+        return 0
+    print('current', current)
+    print('diag', diag + globalmatch)
+    print('up', up -globalgap)
+    print('left',left-globalgap)
+
+    if current == (diag + globalmatch):
+        return 1
+    elif current == (up - globalgap):
+        return 2
+    elif current == (left - globalgap):
+        return 3
+
+    assert False
+
+def globalTraceback(matrix, seq1, seq2):
+    align1 = []
+    align2 = []
+    seq1len = len(seq1)
+    seq2len = len(seq2)
+    x = seq1len - 1
+    y = seq2len - 1
+
+    step = g_next_step(matrix, x, y)
+    while(step!= 0):
+        if step == 1:
+            align1.append(seq1[x-1])
+            align2.append(seq2[y-1])
+            x-=1
+            y-=1
+        elif step == 2:
+            print('-')
+            align1.append('-')
+            align2.append(seq2[y-1])
+            y-=1
+        elif step == 3:
+            print('-')
+            align1.append(seq1[x-1])
+            align2.append('-')
+            x-=1
+        step = g_next_step(matrix, x, y)
+
+
+    align1 = align1[::-1]
+    align2 = align2[::-1]
+
+    align1.append(seq1[x-1])
+    align2.append(seq2[y-1])
+
+    return align1, align2
 
 if __name__ == "__main__":
 
@@ -305,11 +417,18 @@ if __name__ == "__main__":
     ##seq2 = 'ggttgacta'
     seq1, seq2 = read_file()
 
-    matrix, maxpos = local_align(seq1, seq2)
-    align1, align2 = local_traceback(matrix, maxpos)
-    outputs(align1, align2)
-    scores(align1,align2)
+    # matrix, maxpos, max_score = local_align(seq1, seq2)
+    # align1, align2 = local_traceback(matrix, maxpos)
+    # outputs(align1, align2)
+    # scores(align1,align2, max_score)
 
-    print('Match if: \'|\'')
-    print('Mismatch if \':\'')
-    print('Gap if space')
+    seq1 = 'GCATGCU'
+    seq2 = 'GATTACA'
+    matrix = globalAlign(seq1, seq2)
+
+    print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
+    print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
+
+    align1, align2 = globalTraceback(matrix,seq1,seq2)
+
+    print(align1, '\n', align2)
