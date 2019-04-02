@@ -25,12 +25,16 @@ import sys
 ##         Changeable scores???
 
 #match      = +m
-match       = 3
+localmatch       = 3
 #mismatch   = -s
-mismatch    = -3
+localmismatch    = -3
 #gap        = -d
-gap         = -2
+localgap         = -2
 #scoring  F = (# matches)*m - (# mismatches)*s -(#gaps)*d
+
+globalmatch = 1
+globalmismatch = -1
+globalgap = -1
 
 ##minimal edit distance: given two strings x, y, find minimum # of edits
 ##(insertions,deletions,mutations) to transform one string to the other
@@ -89,10 +93,10 @@ def local_align(seq1, seq2):
 
     ## Save this for now for debugging purposes
     ##prints matrix all clean like
-    ##print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
-    ##print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
+    #print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
+    #print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
 
-    return matrix, max_pos
+    return matrix, max_pos, max_score
 
 def local_traceback(matrix, maxpos):
     # NOTE: 4: Traceback in the matrix to find best alignment.
@@ -197,11 +201,11 @@ def score_matrix(matrix, x, y):
     # if seq1[a] == seq2[b]
     #   then: match
     #   else: mismatch
-    diag     = matrix[x-1][y-1] + (match if seq1[x-1] == seq2[y-1] else mismatch)
+    diag     = matrix[x-1][y-1] + (localmatch if seq1[x-1] == seq2[y-1] else localmismatch)
 
     ## These are flipped on accident (i think????)
-    up_adj   = matrix[x-1][y] + gap
-    left_adj = matrix[x][y-1] + gap
+    up_adj   = matrix[x-1][y] + localgap
+    left_adj = matrix[x][y-1] + localgap
     return max(0, diag, up_adj, left_adj)
 
 # Reading stuff from file. Has to be one long string in text file.
@@ -226,10 +230,9 @@ def outputs(align1, align2):
         elif align1[i] != align2[i]:
             formatter.append(':')
 
-    ###### DIRTY(DON'T LOOK) ######
-    ## There's gotta be a better way......
-    ## Move this to another function write_out() ???? Probably
-    ## Also do this all in one go using maxLen and by20. maybe not.
+
+
+    # Messy thing to output aligned sequences to console and text file.
     maxLent = len(align1)
     by20t = 0
     while by20t < maxLent/20:
@@ -251,7 +254,7 @@ def outputs(align1, align2):
 
     maxLen = len(align1)
     by20 = 0
-    ###### MORE DIRT FOR THE WRITE FILE######
+
     with open("segment_aligned.txt", 'w+') as f:
         while by20 < maxLen/20:
             f.write(str(by20*20 +1))
@@ -271,7 +274,7 @@ def outputs(align1, align2):
 
     return 0
 
-def scores(align1, align2):
+def scores(align1, align2, max_score):
     ##scores; matches, mismatches, indels
     totalScore = 0
     same = 0
@@ -279,37 +282,29 @@ def scores(align1, align2):
     for i in range(0,len(align1)):
         if align1[i] == align2[i]:
             same = same + 1
-            totalScore = totalScore + match
+            totalScore = totalScore + localmatch
         elif (align1[i] != align2[i]) and ((align1[i] and align2[i]) != '-'):
-            totalScore = totalScore + mismatch
+            totalScore = totalScore + localmismatch
         elif align1[i] or align2[i] == '-':
-            totalScore = totalScore + gap
+            totalScore = totalScore + localgap
     identity = float(same) / len(align1) * 100
     print('--Smith-Waterman Results--')
     print('Total Score:', totalScore)
+    print('max_score:', max_score)
     print('Identical bases: ', same)
     print('Percent Identity: %.2f' % identity, '%')
     print('Aligned Sequence Length: ', len(align1))
     print('\n')
 
-def globalAlign():
-    pass
-def globalMatrix():
-    pass
-def globalTrackback():
-    pass
-
 if __name__ == "__main__":
 
     ##seq1 = 'tgttacgg'
     ##seq2 = 'ggttgacta'
+
+        ## LOCAL ALIGNMENT ##
     seq1, seq2 = read_file()
 
-    matrix, maxpos = local_align(seq1, seq2)
+    matrix, maxpos, max_score = local_align(seq1, seq2)
     align1, align2 = local_traceback(matrix, maxpos)
     outputs(align1, align2)
-    scores(align1,align2)
-
-    print('Match if: \'|\'')
-    print('Mismatch if \':\'')
-    print('Gap if space')
+    scores(align1,align2, max_score)
