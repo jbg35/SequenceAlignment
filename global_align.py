@@ -77,16 +77,17 @@ def g_next_step(matrix, x, y,seq1, seq2):
     # print('left',left-globalgap)
 
     if current == (diag + (globalmatch if seq1[x-1] == seq2[y-1] else globalmismatch)):
-        print((x,y), current, 'diag->', diag + (globalmatch if seq1[x-1] == seq2[y-1] else globalmismatch))
+        print((seq1[x-1], seq2[y-1]), (x,y), current, 'diag->', diag )
         return 1
     elif current == (up + globalgap):
-        print((x,y), current, 'up->', up+ globalgap)
+        print((seq1[x-1], seq2[y-1]),(x,y), current, 'up->', up)
         return 2
     elif current == (left + globalgap):
-        print((x,y), current, 'left->', left+ globalgap)
+        print((seq1[x-1], seq2[y-1]),(x,y), current, 'left->', left)
         return 3
     else:
         print("SHOULDN'T BE HERE",(x,y), current,diag, up,left)
+        
     assert False
 
 def globalTraceback(matrix, seq1, seq2):
@@ -98,7 +99,7 @@ def globalTraceback(matrix, seq1, seq2):
     y = seq2len
 
     step = g_next_step(matrix, x, y,seq1, seq2)
-    
+
     while(step!= 0):
         if step == 1:
             align1.append(seq1[x-1])
@@ -106,12 +107,10 @@ def globalTraceback(matrix, seq1, seq2):
             x-=1
             y-=1
         elif step == 2:
-            print('-')
             align1.append('-')
             align2.append(seq2[y-1])
             y-=1
         elif step == 3:
-            print('-')
             align1.append(seq1[x-1])
             align2.append('-')
             x-=1
