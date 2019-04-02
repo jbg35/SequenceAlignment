@@ -302,10 +302,9 @@ if __name__ == "__main__":
     ##seq2 = 'ggttgacta'
 
         ## LOCAL ALIGNMENT ##
-    if 0:
-        seq1, seq2 = read_file()
+    seq1, seq2 = read_file()
 
-        matrix, maxpos, max_score = local_align(seq1, seq2)
-        align1, align2 = local_traceback(matrix, maxpos)
-        outputs(align1, align2)
-        scores(align1,align2, max_score)
+    matrix, maxpos, max_score = local_align(seq1, seq2)
+    align1, align2 = local_traceback(matrix, maxpos)
+    outputs(align1, align2)
+    scores(align1,align2, max_score)

@@ -87,7 +87,7 @@ def g_next_step(matrix, x, y,seq1, seq2):
         return 3
     else:
         print("SHOULDN'T BE HERE",(x,y), current,diag, up,left)
-        
+
     assert False
 
 def globalTraceback(matrix, seq1, seq2):
@@ -133,4 +133,6 @@ if __name__ == "__main__":
     print('        ', ''.join(['{:5}'.format(item) for item in seq2]))
     print('\n'.join([''.join(['{:5}'.format(item) for item in row]) for row in matrix]))
     align1, align2 = globalTraceback(matrix,seq1,seq2)
-    print(align1, '\n', align2)
+    print('\n')
+    print(align1)
+    print(align2)
