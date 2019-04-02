@@ -56,17 +56,18 @@ def globalAlign(seq1, seq2):
     # Scores the rest of the table
     for i in range(1, seq1len):
         for j in range(1, seq2len):
-            match     = matrix[i-1][j-1] + (globalmatch if seq1[i-1] == seq2[j-1] else globalmismatch)
+            match     = matrix[i-1][j-1] + (globalmatch if seq1[i] == seq2[j] else globalmismatch)
             delete    = matrix[i-1][j] + globalgap
             insert     = matrix[i][j-1] + globalgap
+            print(seq1[i], seq2[j], (i,j),"match: ", match, "delete: ", delete,"insert: ", insert)
             matrix[i][j] = max(match, delete, insert)
     return matrix
 
-def g_next_step(matrix, x, y):
+def g_next_step(matrix, x, y,seq1, seq2):
     current = matrix[x][y]
     diag = matrix[x-1][y-1]
-    up   = matrix[x][y-1]
-    left = matrix[x-1][y]
+    up   = matrix[x-1][y]
+    left = matrix[x][y-1]
 
     if(x==0 or y==0):
         return 0
@@ -75,8 +76,8 @@ def g_next_step(matrix, x, y):
     # print('up', up -globalgap)
     # print('left',left-globalgap)
 
-    if current == (diag + globalmatch):
-        print((x,y), current, 'diag->', diag+ globalmatch)
+    if current == (diag + (globalmatch if seq1[x-1] == seq2[y-1] else globalmismatch)):
+        print((x,y), current, 'diag->', diag + (globalmatch if seq1[x-1] == seq2[y-1] else globalmismatch))
         return 1
     elif current == (up + globalgap):
         print((x,y), current, 'up->', up+ globalgap)
@@ -85,7 +86,7 @@ def g_next_step(matrix, x, y):
         print((x,y), current, 'left->', left+ globalgap)
         return 3
     else:
-        print("what the",(x,y), current,diag + globalmatch, up + globalgap,left + globalgap)
+        print("SHOULDN'T BE HERE",(x,y), current,diag, up,left)
     assert False
 
 def globalTraceback(matrix, seq1, seq2):
@@ -96,8 +97,8 @@ def globalTraceback(matrix, seq1, seq2):
     x = seq1len
     y = seq2len
 
-    step = g_next_step(matrix, x, y)
-
+    step = g_next_step(matrix, x, y,seq1, seq2)
+    
     while(step!= 0):
         if step == 1:
             align1.append(seq1[x-1])
@@ -115,14 +116,12 @@ def globalTraceback(matrix, seq1, seq2):
             align2.append('-')
             x-=1
 
-        step = g_next_step(matrix, x, y)
-
+        step = g_next_step(matrix, x, y,seq1, seq2)
 
     align1 = align1[::-1]
     align2 = align2[::-1]
-
-    align1.append(seq1[x-1])
-    align2.append(seq2[y-1])
+    #align1.append(seq1[x-1])
+    #align2.append(seq2[y-1])
 
     return align1, align2
 
