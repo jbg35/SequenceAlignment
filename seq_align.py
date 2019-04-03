@@ -164,8 +164,6 @@ def score_matrix(matrix, x, y):
     #   then: match
     #   else: mismatch
     diag     = matrix[x-1][y-1] + (localmatch if seq1[x-1] == seq2[y-1] else localmismatch)
-
-    ## These are flipped on accident (i think????)
     up_adj   = matrix[x-1][y] + localgap
     left_adj = matrix[x][y-1] + localgap
     return max(0, diag, up_adj, left_adj)
