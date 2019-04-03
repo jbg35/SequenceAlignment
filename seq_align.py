@@ -2,28 +2,6 @@ import sys
 # For my comments, usually one # (#) means comment is to explain code,
 # and two # (##) non-permanent stuff
 
-##  SHOULD PROBABLY ADD TESTS TO CONFIRM THIS EVEN works
-
-## Local alignment implementation but,
-## only finds aligned sequence with the highest score
-## # TODO: Find other max values to use for local alignments ????
-##         Threshold for what a max value can be????
-##         FROM wikipedia:
-##         To obtain the second best local alignment, apply the traceback process starting at
-##         the second highest score outside the trace of the best alignment.
-## # TODO: Global alignment?????
-##         FROM wikipedia: https://en.wikipedia.org/wiki/Needleman%E2%80%93Wunsch_algorithm
-##         Probably easy, just need to create another matrix then traceback from,
-##         absolute bottom right.
-## # TODO: Add functions for adding statistics to final output;
-##         how many similar bases, how many gaps, how many mismatches
-##         total score
-## # TODO: Rename align(), traceback() so that global alignment can be implemented,
-##         align()-> localAlign(), traceback()-> localTraceback(), score_matrix() -> localMatrix()
-##                -> globalAlign(),           -> globalTraceback,                 -> globalMatrix()
-##         Make scores a local variable. (Use same scores for local and global???)
-##         Changeable scores???
-
 #match      = +m
 localmatch       = 3
 #mismatch   = -s
@@ -31,18 +9,6 @@ localmismatch    = -3
 #gap        = -d
 localgap         = -2
 #scoring  F = (# matches)*m - (# mismatches)*s -(#gaps)*d
-
-globalmatch = 1
-globalmismatch = -1
-globalgap = -1
-
-##minimal edit distance: given two strings x, y, find minimum # of edits
-##(insertions,deletions,mutations) to transform one string to the other
-
-##ok to have unlimited # of gaps in beginning & end?
-##don't penalize gaps on either end
-
-##insertions and/or deletions are called indels
 
 def local_align(seq1, seq2):
     # Some sequence info
@@ -162,10 +128,6 @@ def next_step(matrix, x, y):
     up   =  matrix[x][y-1]
     left =  matrix[x-1][y]
 
-    ## WHAT IF TWO ARE THE SAME???
-    ## If diag is the same with either(up, left) always go diag
-    ## What if up is same as left??? With max() I think hierarchy is diag->up->left
-    ## Does it matter???
     maxstep = max(diag,up,left)
     # Quick reject function. If diag or up or left is zero
     # then the function ends traceback.
@@ -210,7 +172,6 @@ def score_matrix(matrix, x, y):
 
 # Reading stuff from file. Has to be one long string in text file.
 def read_file():
-    ## Use delimeter for multi-line reading????
     f = open("segment.txt", "r")
     x = f.read().split('\n')
     Seq1 = x[0]
@@ -297,9 +258,6 @@ def scores(align1, align2, max_score):
     print('\n')
 
 if __name__ == "__main__":
-
-    ##seq1 = 'tgttacgg'
-    ##seq2 = 'ggttgacta'
 
         ## LOCAL ALIGNMENT ##
     seq1, seq2 = read_file()
